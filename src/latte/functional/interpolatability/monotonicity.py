@@ -13,7 +13,7 @@ def _validate_monotonicity_args(
     assert liad_mode in _utils.__VALID_LIAD_MODE__
     assert reduce_mode in _utils.__VALID_REDUCE_MODE__
 
-    if np.isnan(degenerate_val) and nanmean is False and reduce_mode != "none":
+    if np.isnan(degenerate_val) and not nanmean and reduce_mode != "none":
         warnings.warn(
             "`nanmean` is set to False and `degenerate_val` is set to NaN. This may result in NaN values in the return array. Set `nanmean` to True to ignore NaN values during mean calculation.",
             RuntimeWarning,

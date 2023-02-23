@@ -11,8 +11,6 @@ except:
     has_torch = False
 
 try:
-    pass
-
     has_tm = True
 except:
     has_tm = False

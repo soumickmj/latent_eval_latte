@@ -23,7 +23,7 @@ def _validate_smoothness_args(
     else:
         raise TypeError("`ptp_mode` must be either a string or a float.")
 
-    if not (p > 1.0):
+    if p <= 1.0:
         raise ValueError("`p` must be greater than 1.0.")
 
 
@@ -48,10 +48,10 @@ def _get_smoothness_from_liads(
 ) -> np.ndarray:
     liad2abs = np.abs(liad2)
 
-    if max_mode == "naive":
-        num = np.max(liad2abs, axis=-1)
-    elif max_mode == "lehmer":
+    if max_mode == "lehmer":
         num = _utils._lehmer_mean(liad2abs, p=p)
+    elif max_mode == "naive":
+        num = np.max(liad2abs, axis=-1)
     else:
         raise NotImplementedError
 
