@@ -40,9 +40,8 @@ def _validate_za_shape(
         assert max(reg_dim) < n_features
 
         z = z[:, reg_dim, :]
-    else:
-        if n_attr < n_features:
-            z = z[:, :n_attr, :]
+    elif n_attr < n_features:
+        z = z[:, :n_attr, :]
 
     return z, a
 
@@ -68,22 +67,18 @@ def _finite_diff(
 
     rets = []
 
-    if mode == "forward":
-        for _ in range(order):
-            da = np.diff(a, n=1, axis=-1)
-            dz = np.diff(z, n=1, axis=-1)
-
-            a = da / dz
-            z = 0.5 * (z[..., :-1] + z[..., 1:])
-
-            rets.append((a, z))
-    else:
+    if mode != "forward":
         raise NotImplementedError
 
-    if return_list:
-        return rets
-    else:
-        return a, z
+    for _ in range(order):
+        da = np.diff(a, n=1, axis=-1)
+        dz = np.diff(z, n=1, axis=-1)
+
+        a = da / dz
+        z = 0.5 * (z[..., :-1] + z[..., 1:])
+
+        rets.append((a, z))
+    return rets if return_list else (a, z)
 
 
 def _liad(
@@ -94,7 +89,7 @@ def _liad(
     return_list: bool = False,
 ) -> Union[Tuple[np.ndarray, np.ndarray], List[Tuple[np.ndarray, np.ndarray]]]:
 
-    if mode in ["forward"]:
+    if mode in {"forward"}:
         rets = _finite_diff(z, a, order, mode, return_list=return_list)
     else:
         # TODO: add spline interpolation derivatives
@@ -105,10 +100,7 @@ def _liad(
 
 def _lehmer_mean(x: np.ndarray, p: float) -> np.ndarray:
 
-    if p == 1.0:
-        den = np.ones_like(x)
-    else:
-        den = np.power(x, p - 1.0)
+    den = np.ones_like(x) if p == 1.0 else np.power(x, p - 1.0)
     num = x * den
 
     with np.errstate(divide="ignore", invalid="ignore"):
